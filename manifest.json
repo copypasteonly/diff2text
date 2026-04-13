@@ -1,0 +1,35 @@
+{
+  "manifest_version": 2,
+  "name": "diff2text",
+  "version": "1.0",
+  "description": "Copy GitHub PR metadata and diff to clipboard with one click.",
+  "permissions": [
+    "storage",
+    "clipboardWrite",
+    "https://github.com/*",
+    "https://patch-diff.githubusercontent.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*/pull/*"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "browser_action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    }
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "diff2text@extension"
+    }
+  }
+}
