@@ -2,9 +2,30 @@
   const PR_URL_RE = /\/([^/]+)\/([^/]+)\/pull\/(\d+)/;
   const BUTTON_ID = "diff2text-copy-btn";
 
-  const PASTE_ICON_SVG = `<svg class="octicon octicon-paste mr-1" height="16" viewBox="0 0 16 16" width="16" aria-hidden="true">
-    <path fill-rule="evenodd" d="M5.75 1a.75.75 0 00-.75.75v3c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75h-4.5zm.75 3V2.5h3V4h-3zm-2.874-.467a.75.75 0 00-.752-1.298A1.75 1.75 0 002 3.75v9.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-9.5a1.75 1.75 0 00-.874-1.515.75.75 0 10-.752 1.298.25.25 0 01.126.217v9.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.126-.217z"></path>
-  </svg>`;
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const PASTE_ICON_PATH =
+    "M5.75 1a.75.75 0 00-.75.75v3c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75h-4.5zm.75 3V2.5h3V4h-3zm-2.874-.467a.75.75 0 00-.752-1.298A1.75 1.75 0 002 3.75v9.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-9.5a1.75 1.75 0 00-.874-1.515.75.75 0 10-.752 1.298.25.25 0 01.126.217v9.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.126-.217z";
+
+  function createPasteIcon() {
+    const svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("class", "octicon octicon-paste mr-1");
+    svg.setAttribute("height", "16");
+    svg.setAttribute("width", "16");
+    svg.setAttribute("viewBox", "0 0 16 16");
+    svg.setAttribute("aria-hidden", "true");
+
+    const path = document.createElementNS(SVG_NS, "path");
+    path.setAttribute("fill-rule", "evenodd");
+    path.setAttribute("d", PASTE_ICON_PATH);
+    svg.appendChild(path);
+    return svg;
+  }
+
+  function fillButtonLabel(label) {
+    label.textContent = "";
+    label.appendChild(createPasteIcon());
+    label.appendChild(document.createTextNode("Copy PR"));
+  }
 
   // --- DOM Scraping ---
 
@@ -167,12 +188,7 @@
   function resetButton(btn) {
     btn.disabled = false;
     const label = btn.querySelector(".Button-label");
-    if (label) {
-      label.textContent = "";
-      const temp = document.createElement("template");
-      temp.innerHTML = `${PASTE_ICON_SVG}Copy PR`;
-      label.appendChild(temp.content);
-    }
+    if (label) fillButtonLabel(label);
   }
 
   // --- Button Injection ---
@@ -194,9 +210,7 @@
     content.className = "Button-content";
     const label = document.createElement("span");
     label.className = "Button-label";
-    const temp = document.createElement("template");
-    temp.innerHTML = `${PASTE_ICON_SVG}Copy PR`;
-    label.appendChild(temp.content);
+    fillButtonLabel(label);
     content.appendChild(label);
     btn.appendChild(content);
 
