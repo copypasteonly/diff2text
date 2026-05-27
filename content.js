@@ -53,6 +53,13 @@
     return "unknown";
   }
 
+  function getTitle() {
+    const el =
+      document.querySelector(".gh-header-title .js-issue-title") ||
+      document.querySelector(".js-issue-title");
+    return el ? el.textContent.trim() : "";
+  }
+
   function normalizeDescription(text) {
     const value = text.trim();
     if (!value) return "";
@@ -139,13 +146,29 @@
 
   // --- Config ---
 
-  async function getConfigText() {
+  const DEFAULT_TEMPLATE = `{{TITLE}}
+PR #{{PR_NUMBER}}
+Author: {{AUTHOR}}
+PR Description:
+{{DESCRIPTION}}
+
+{{DIFF}}`;
+
+  async function getTemplate() {
     try {
       const result = await browser.storage.local.get("configText");
-      return result.configText || "";
+      return result.configText || DEFAULT_TEMPLATE;
     } catch {
-      return "";
+      return DEFAULT_TEMPLATE;
     }
+  }
+
+  function renderTemplate(template, vars) {
+    let output = template;
+    for (const [key, value] of Object.entries(vars)) {
+      output = output.split(`{{${key}}}`).join(value);
+    }
+    return output;
   }
 
   // --- Assembly & Copy ---
@@ -158,21 +181,23 @@
     btn.querySelector(".Button-label").textContent = "Copying...";
 
     try {
-      const [diff, configText] = await Promise.all([
+      const [diff, template] = await Promise.all([
         fetchDiff(),
-        getConfigText(),
+        getTemplate(),
       ]);
 
-      const author = getAuthor();
-      const description = await getDescription(pr);
+      const prUrl = `${window.location.origin}/${pr.owner}/${pr.repo}/pull/${pr.number}`;
 
-      let output = "";
-      if (configText) output += configText + "\n";
-      output += `PR #${pr.number}\n`;
-      output += `Author: ${author}\n`;
-      output += `PR Description:\n`;
-      output += description + "\n\n";
-      output += diff;
+      const output = renderTemplate(template, {
+        PR_NUMBER: pr.number,
+        TITLE: getTitle(),
+        AUTHOR: getAuthor(),
+        DESCRIPTION: await getDescription(pr),
+        DIFF: diff,
+        REPO: pr.repo,
+        OWNER: pr.owner,
+        URL: prUrl,
+      });
 
       await navigator.clipboard.writeText(output);
 

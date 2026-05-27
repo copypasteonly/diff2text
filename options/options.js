@@ -12,7 +12,7 @@ PR Description:
 
 {{DIFF}}`;
 
-// Load saved config on popup open
+// Load saved config
 browser.storage.local.get("configText").then((result) => {
   textarea.value = result.configText || DEFAULT_TEMPLATE;
 });
@@ -31,17 +31,6 @@ document.querySelectorAll(".chip").forEach((chip) => {
     textarea.focus();
     textarea.selectionStart = textarea.selectionEnd = start + tag.length;
   });
-});
-
-// Force popup frame to resize when textarea is dragged
-new ResizeObserver(() => {
-  document.body.style.height = document.body.scrollHeight + "px";
-}).observe(textarea);
-
-// Expand editor (options page)
-document.getElementById("open-full").addEventListener("click", () => {
-  browser.runtime.openOptionsPage();
-  window.close();
 });
 
 // Save

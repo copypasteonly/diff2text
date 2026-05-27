@@ -2,15 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>diff2text — Settings</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="options.css">
 </head>
 <body>
-  <div class="popup">
+  <div class="container">
     <header class="header">
       <h1>diff2text</h1>
+      <span class="subtitle">Output template</span>
     </header>
 
     <section class="variables">
@@ -28,16 +30,14 @@
     </section>
 
     <section class="editor">
-      <label for="config-text" class="section-label">Template</label>
-      <textarea id="config-text" rows="14" spellcheck="false"></textarea>
+      <textarea id="config-text" rows="24" spellcheck="false"></textarea>
     </section>
 
     <div class="actions">
       <button id="save-btn" type="button" class="save-btn">Save</button>
       <span id="status"></span>
-      <button id="open-full" type="button" class="expand-btn">Expand editor</button>
     </div>
   </div>
-  <script src="popup.js"></script>
+  <script src="options.js"></script>
 </body>
 </html>

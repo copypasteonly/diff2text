@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "diff2text",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Copy GitHub PR metadata and diff to clipboard with one click.",
   "permissions": [
     "storage",
@@ -26,6 +26,10 @@
   "icons": {
     "48": "icons/icon-48.png",
     "96": "icons/icon-96.png"
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
   },
   "browser_specific_settings": {
     "gecko": {

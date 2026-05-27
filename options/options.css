@@ -6,39 +6,42 @@
   box-sizing: border-box;
 }
 
-html, body {
-  height: auto;
-}
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  font-size: 12px;
+  font-size: 13px;
   color: #1a1a1a;
-  background: #fafafa;
+  background: #f5f5f5;
+  min-height: 100vh;
+  padding: 48px 24px;
 }
 
-.popup {
-  width: 400px;
-  padding: 16px 18px;
+.container {
+  max-width: 680px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
 }
 
 /* --- Header --- */
 
 .header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
 }
 
 h1 {
   font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 500;
   letter-spacing: -0.02em;
   color: #1a1a1a;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #888;
 }
 
 /* --- Section labels --- */
@@ -50,29 +53,25 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: #888;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 /* --- Variable chips --- */
 
-.variables {
-  /* no extra spacing needed, gap on .popup handles it */
-}
-
 .chip-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 6px;
 }
 
 .chip {
   font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 400;
-  padding: 3px 8px;
-  background: #f0f0f0;
+  padding: 4px 10px;
+  background: #fff;
   color: #444;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.12s ease;
@@ -80,14 +79,14 @@ h1 {
 }
 
 .chip:hover {
-  background: #e4e4e4;
+  background: #e8e8e8;
   color: #1a1a1a;
   transform: translateY(-1px);
 }
 
 .chip:active {
   transform: translateY(0);
-  background: #d8d8d8;
+  background: #ddd;
 }
 
 /* --- Textarea --- */
@@ -99,14 +98,15 @@ h1 {
 
 textarea {
   width: 100%;
-  padding: 10px 12px;
+  min-height: 400px;
+  padding: 16px 18px;
   font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: 12px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.7;
   color: #1a1a1a;
   background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   resize: vertical;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -114,7 +114,7 @@ textarea {
 
 textarea:focus {
   border-color: #0969da;
-  box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.15);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.12);
 }
 
 /* --- Actions --- */
@@ -122,14 +122,14 @@ textarea:focus {
 .actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .save-btn {
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  padding: 5px 20px;
+  padding: 7px 28px;
   color: #0969da;
   background: transparent;
   border: 1px solid #0969da;
@@ -150,7 +150,7 @@ textarea:focus {
 }
 
 #status {
-  font-size: 11px;
+  font-size: 12px;
   color: #1a7f37;
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -158,23 +158,4 @@ textarea:focus {
 
 #status.visible {
   opacity: 1;
-}
-
-.expand-btn {
-  margin-left: auto;
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 500;
-  padding: 4px 12px;
-  color: #888;
-  background: transparent;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.12s ease;
-}
-
-.expand-btn:hover {
-  color: #0969da;
-  border-color: #0969da;
 }
