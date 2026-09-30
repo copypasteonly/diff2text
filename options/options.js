@@ -1,6 +1,7 @@
 const textarea = document.getElementById("config-text");
 const saveBtn = document.getElementById("save-btn");
 const statusEl = document.getElementById("status");
+const tokenInput = document.getElementById("github-token");
 
 let statusTimeout = null;
 
@@ -13,8 +14,9 @@ PR Description:
 {{DIFF}}`;
 
 // Load saved config
-browser.storage.local.get("configText").then((result) => {
+browser.storage.local.get(["configText", "githubToken"]).then((result) => {
   textarea.value = result.configText || DEFAULT_TEMPLATE;
+  tokenInput.value = result.githubToken || "";
 });
 
 // Variable chip insertion
@@ -36,8 +38,7 @@ document.querySelectorAll(".chip").forEach((chip) => {
 // Save
 saveBtn.addEventListener("click", () => {
   browser.storage.local
-    .set({ configText: textarea.value })
-    .then(() => browser.storage.local.remove("githubToken"))
+    .set({ configText: textarea.value, githubToken: tokenInput.value.trim() })
     .then(() => {
       statusEl.textContent = "Saved!";
       statusEl.classList.add("visible");

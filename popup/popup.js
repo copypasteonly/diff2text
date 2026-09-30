@@ -48,7 +48,6 @@ document.getElementById("open-full").addEventListener("click", () => {
 saveBtn.addEventListener("click", () => {
   browser.storage.local
     .set({ configText: textarea.value })
-    .then(() => browser.storage.local.remove("githubToken"))
     .then(() => {
       statusEl.textContent = "Saved!";
       statusEl.classList.add("visible");

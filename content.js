@@ -38,6 +38,9 @@
   function getAuthor() {
     const authorLink =
       document.querySelector(".gh-header-meta .author") ||
+      document.querySelector(
+        "[data-component='PageHeader.Description'] a[data-hovercard-type='user']"
+      ) ||
       document.querySelector("[data-hovercard-type='user'].author") ||
       document.querySelector(".pull-header-author .author");
     if (authorLink) return authorLink.textContent.trim();
@@ -56,7 +59,8 @@
   function getTitle() {
     const el =
       document.querySelector(".gh-header-title .js-issue-title") ||
-      document.querySelector(".js-issue-title");
+      document.querySelector(".js-issue-title") ||
+      document.querySelector("h1[data-component='PH_Title'] .markdown-title");
     return el ? el.textContent.trim() : "";
   }
 
@@ -127,21 +131,72 @@
 
   // --- Diff Fetching ---
 
-  function fetchDiff() {
-    const pr = parsePrFromUrl();
-    if (!pr) return Promise.reject(new Error("Not on a PR page"));
+  async function fetchText(url, options) {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      const error = new Error(`HTTP ${response.status} from ${response.url}`);
+      error.status = response.status;
+      throw error;
+    }
+    return response.text();
+  }
 
+  function fetchDiffFromApi(pr, token) {
+    const headers = { Accept: "application/vnd.github.diff" };
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    return fetchText(
+      `https://api.github.com/repos/${pr.owner}/${pr.repo}/pulls/${pr.number}`,
+      { headers, credentials: "omit" }
+    );
+  }
+
+  async function fetchDiffFromSession(pr) {
     const diffUrl = `${window.location.origin}/${pr.owner}/${pr.repo}/pull/${pr.number}.diff`;
+    const options = { credentials: "include", redirect: "follow" };
 
-    return fetch(diffUrl, {
-      credentials: "include",
-      redirect: "follow",
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} from ${response.url}`);
+    try {
+      return await fetchText(diffUrl, options);
+    } catch (err) {
+      // patch-diff.githubusercontent.com sometimes returns transient 5xx
+      if (!(err.status >= 500)) throw err;
+      console.warn("[diff2text] Retrying .diff after", err.message);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return fetchText(diffUrl, options);
+    }
+  }
+
+  async function getToken() {
+    try {
+      const result = await browser.storage.local.get("githubToken");
+      return (result.githubToken || "").trim();
+    } catch {
+      return "";
+    }
+  }
+
+  // Order: API with token (if set) -> session .diff (retried once on 5xx)
+  // -> unauthenticated API (public repos only).
+  async function fetchDiff() {
+    const pr = parsePrFromUrl();
+    if (!pr) throw new Error("Not on a PR page");
+
+    const token = await getToken();
+    const attempts = [];
+    if (token) attempts.push(["API (token)", () => fetchDiffFromApi(pr, token)]);
+    attempts.push(["session .diff", () => fetchDiffFromSession(pr)]);
+    if (!token) attempts.push(["API (no token)", () => fetchDiffFromApi(pr, "")]);
+
+    const failures = [];
+    for (const [name, attempt] of attempts) {
+      try {
+        return await attempt();
+      } catch (err) {
+        console.warn(`[diff2text] ${name} failed:`, err.message);
+        failures.push(`${name}: ${err.message}`);
       }
-      return response.text();
-    });
+    }
+    throw new Error(`All diff sources failed (${failures.join("; ")})`);
   }
 
   // --- Config ---
@@ -221,9 +276,8 @@ PR Description:
   function injectButton() {
     if (document.getElementById(BUTTON_ID)) return;
 
-    // Anchor into the PR header actions (available on all PR tabs)
-    const headerActions = document.querySelector(".gh-header-actions");
-    if (!headerActions) return;
+    const anchor = findButtonAnchor();
+    if (!anchor) return;
 
     const btn = document.createElement("button");
     btn.id = BUTTON_ID;
@@ -241,7 +295,30 @@ PR Description:
 
     btn.addEventListener("click", () => copyPrData(btn));
 
-    headerActions.prepend(btn);
+    if (anchor.prepend) {
+      anchor.el.prepend(btn);
+    } else {
+      btn.classList.add("ml-2");
+      anchor.el.appendChild(btn);
+    }
+  }
+
+  // Old header (Files tab, classic UI) uses .gh-header-actions. The React PR
+  // page uses a Primer PageHeader whose actions slot is hidden (d-none) when
+  // empty, e.g. logged out, so fall back to the title area in that case.
+  function findButtonAnchor() {
+    const legacy = document.querySelector(".gh-header-actions");
+    if (legacy) return { el: legacy, prepend: true };
+
+    const actions = document.querySelector("[data-component='PH_Actions']");
+    if (actions && !actions.classList.contains("d-none")) {
+      return { el: actions, prepend: true };
+    }
+
+    const titleArea = document.querySelector("[data-component='TitleArea']");
+    if (titleArea) return { el: titleArea, prepend: false };
+
+    return null;
   }
 
   // --- Navigation Handling ---

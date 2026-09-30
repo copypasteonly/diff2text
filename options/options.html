@@ -33,6 +33,16 @@
       <textarea id="config-text" rows="24" spellcheck="false"></textarea>
     </section>
 
+    <section class="token">
+      <label for="github-token" class="section-label">GitHub token (optional)</label>
+      <input id="github-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_...">
+      <p class="hint">
+        Used first to fetch diffs from the GitHub API. Use a fine-grained token with
+        read-only "Pull requests" and "Contents" access. If it's empty or the request
+        fails, diff2text falls back to your github.com session.
+      </p>
+    </section>
+
     <div class="actions">
       <button id="save-btn" type="button" class="save-btn">Save</button>
       <span id="status"></span>

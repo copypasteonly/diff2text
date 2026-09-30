@@ -117,6 +117,33 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.12);
 }
 
+/* --- Token --- */
+
+.token input {
+  width: 100%;
+  padding: 8px 12px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 13px;
+  color: #1a1a1a;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.token input:focus {
+  border-color: #0969da;
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.12);
+}
+
+.hint {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #888;
+  line-height: 1.5;
+}
+
 /* --- Actions --- */
 
 .actions {
